@@ -1,0 +1,18 @@
+Data and queries
+================
+
+The Semantic Web Dogfood dataset [1] is available in N-Triples (data.nt) and N-Quads (data.nq); a set of automatically generated queries from that dataset is in queries-random.txt.
+
+JMeter
+======
+
+There is a JMeter configuration file queries.random.jmx which JMeter uses to iterates over the queries-random.txt file and perform lookups.
+
+Proxy Setup
+===========
+
+To test CumulusRDF locally but with correct Linked Data URIs, put cumulus.war into the root of your Tomcat (mv cumulus.war ROOT.war; deploy ROOT.war) and point JMeter to use localhost tomcat-port as proxy.
+
+Start JMeter with the "-H proxyhost -P proxyport" parameters.
+
+[1] http://data.semanticweb.org/

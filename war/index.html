@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>CumulusRDF Store</title>
+  </head>
+
+  <body>
+    <h1>CumulusRDF Store</h1>
+
+    <h2>Introduction</h2>
+
+    <p>
+      CumulusRDF is a Linked Data server built on <a href="http://cassandra.apache.org/">Apache Cassandra</a>.
+      Applications can interface with CumulusRDF using a <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">REST</a> API, meaning that all operations are carried out over <a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a>.
+    </p>
+
+    <p>
+      More information at <a href="http://code.google.com/p/cumulusrdf/">http://code.google.com/p/cumulusrdf/</a>.
+    </p>
+
+<!--
+    <p>
+      For relative URIs to function so that CumulusRDF can act as Linked Data server, you must install the .war file as ROOT.war (to arrive at a URI such as http://localhost:8888/ for the main page).
+    </p>
+-->
+
+    <h2>Basic Operations</h2>
+
+    <p>
+      CumulusRDF currently supports read and query operations via the REST interface.
+<!-- supports write, read and delete operations, plus a query operation which allows for evaluating single triple patterns. -->
+      We work on extending the REST interface to support all of the <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">create, read, update, and delete</a> (CRUD) operations.
+    </p>
+
+<!--
+    <h3>Write</h3>
+
+    <p>
+      You can write data via HTTP POST.
+      CumulusRDF supports <a href="http://en.wikipedia.org/wiki/N-Triples">N-Triples</a> and <a href="http://en.wikipedia.org/wiki/RDF/XML">RDF/XML</a> as RDF input format.
+    </p>
+    <p>
+      <code>
+	curl -v -X POST -H "Content-Type: text/plain" --data-binary @data/dogfood/data.nt http://localhost:8080/crud
+      </code>
+    </p>
+-->
+
+    <h3>Read</h3>
+
+    <p>
+      You can access the contents of an object by performing a HTTP GET request.
+    </p>
+
+    <p>
+      <code>
+	curl -v http://localhost:8080/crud?uri=http%3A%2F%2Fdata.semanticweb.org%2Fperson%2Fdan-brickley
+      </code>
+    </p>
+
+    <form action="./crud">
+      <input name="uri" size="50" value="http://data.semanticweb.org/person/dan-brickley"/>
+
+      <input type="submit"/>
+    </form>
+
+    <p>
+      Such a lookup is similar to a SPARQL DESCRIBE query.
+      You can specify the output format via the <code>Accept</code> header (<code>text/plain</code> for N-Triples and <code>application/rdf+xml</code> for RDF/XML).
+    </p>
+
+    <h3>Query</h3>
+
+    <p>
+      You can evaluate triple patterns via performing a HTTP GET request supplying <code>s, p  and/or o</code> parameters (in N3 syntax).
+    </p>
+
+    <p>
+      <code>
+	curl -v http://localhost:8080/query?s=%3Chttp%3A%2F%2Fdata.semanticweb.org%2Fperson%2Fdan-brickley%3E&amp;p=%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23label%3E
+      </code>
+    </p>
+
+    <form action="./query">
+      <input name="s" size="30" value="<http://data.semanticweb.org/person/dan-brickley>"/>
+      <input name="p" size="30" value="<http://www.w3.org/2000/01/rdf-schema#label>"/>
+      <input name="o" size="30"/>
+
+      <input type="submit"/>
+    </form>
+
+    <h3>Search</h3>
+
+    <p>
+      You can pose basic keyword searches via HTTP GET.
+      Load keyword index via <code>curl --data-binary @data/dogfood-crawled/data.nq -X POST "http://localhost:8080/cumulusrdf/search"</code>
+    </p>
+
+    <form action="./search">
+      <input name="q" size="30" value="dan"/>
+
+      <input type="submit"/>
+    </form>
+
+<!--
+    <h3>Delete</h3>
+
+    <p>
+      You can delete triples by performing a HTTP DELETE request sending the triples you want to delete.
+    </p>
+
+    <p>
+      <code>
+	curl -v -X DELETE -H "Content-Type: text/plain" - - data-binary @data/dogfood/data.nt http://localhost:8080/crud?uri=http%3A%2F%2Fdata.semanticweb.org%2Fperson%2Fdan-brickley
+      </code>
+    </p>
+-->
+
+    <h2>Additional Operations</h2>
+
+    <h3>SPARQL Queries</h3>
+
+    <p>
+      We grudingly allow for <a href="http://en.wikipedia.org/wiki/SPARQL">SPARQL</a> queries, based on the <a href="http://openrdf.org/">Sesame</a> query processor (unoptimised).
+    </p>
+
+    <form action="./sparql">
+      <dl>
+	<dt>Query</dt>
+	<dd>
+	  <textarea cols="90" rows="12" name='query'>PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;
+PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
+PREFIX sioc: &lt;http://rdfs.org/sioc/ns#&gt;
+
+SELECT * 
+WHERE {
+  ?o foaf:name "Andreas Harth" .
+  ?p &lt;http://swrc.ontoware.org/ontology#author&gt; ?o .
+}</textarea></dd>
+	<dt>
+	  Result format (alternatively, use an <a href="http://en.wikipedia.org/wiki/Content_negotiation">Accept header</a>)
+	</dt>
+	<dd>
+	  <select name="accept">
+
+      	    <option/>
+	    <option value="text/plain">text/plain</option>
+    	    <option value="text/csv">text/csv</option>	
+    	    <option value="application/sparql-results+json">application/sparql-results+json</option>
+	    <option value="application/sparql-results+xml">application/sparql-results+xml</option>
+    	    <option value="application/rdf+xml">application/rdf+xml</option>
+    	    <option value="application/x-turtle">application/x-turtle</option>
+
+    	    <option value="application/n3">application/n3</option>
+    	    <option value="text/nx">text/nx</option>
+	  </select>
+	</dd>
+      </dl>
+      <input type="submit"/>
+    </form>
+
+    <h3>Info</h3>
+
+    <p>
+      You can get status information at <a href="./info">/info</a>.
+    </p>
+
+<!--
+    <h3>Dump</h3>
+
+    <p>
+      You can download all data currently stored at <a href="./dump">/dump</a>.
+    </p>
+-->
+    <hr/>
+
+    <div>
+      &#169; 2010-2012 <a href="http://www.aifb.kit.edu/web/G%C3%BCnter_Ladwig">G&#252;nter Ladwig</a>, <a href="http://harth.org/andreas/">Andreas Harth</a>.
+    </div>
+  </body>
+</html>

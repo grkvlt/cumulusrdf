@@ -1,0 +1,1 @@
+java -jar ldspider-trunk.jar -s subjects.txt -n -b 0 -o data.nq -t 2 -a access.log -r redirects.nx 2> stderr.log
