@@ -32,6 +32,7 @@ import edu.kit.aifb.cumulus.webapp.formatter.StaxRDFXMLFormat;
  */
 public class Listener implements ServletContextListener {
 
+	private static final String PROPERTY_CONFIGFILE = "cumulusrdf.config-file";
 	private static final String PARAM_CONFIGFILE = "config-file";
 	
 	private static final String PARAM_HOSTS = "cassandra-hosts";
@@ -90,7 +91,10 @@ public class Listener implements ServletContextListener {
 		TupleQueryResultFormat.register(SPARQLResultsNxWriterFactory.NX);
 		TupleQueryResultWriterRegistry.getInstance().add(new SPARQLResultsNxWriterFactory());
 
-		String configFile = ctx.getInitParameter(PARAM_CONFIGFILE);
+		String configFile = System.getProperty(PROPERTY_CONFIGFILE);
+		if (configFile == null) {
+		   configFile = ctx.getInitParameter(PARAM_CONFIGFILE);
+        }
 		
 		Map<String,String> config = null;
 		if (configFile != null && new File(configFile).exists()) {
