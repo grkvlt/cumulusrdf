@@ -19,8 +19,7 @@ import edu.kit.aifb.cumulus.store.CassandraRdfHectorQuads;
 import edu.kit.aifb.cumulus.store.StoreException;
 import edu.kit.aifb.cumulus.webapp.formatter.SerializationFormat;
 
-/** 
- * 
+/**
  * @author aharth
  */
 @SuppressWarnings("serial")
@@ -67,21 +66,18 @@ public class ProxyServlet extends AbstractHttpServlet {
 			if (!from.equals(to)) {
 				resp.sendRedirect(to);
 				_log.info("[proxy] GET " + resource.toN3() + " REDIRECT " + to + " " + (System.currentTimeMillis() - start) + "ms");
-			}
-			else {
+			} else {
 				Iterator<Node[]> it = crdf.query(new Node[] { new Variable("s"), new Variable("p"), new Variable("o"), resource });
 				if (it.hasNext()) {
 					resp.setContentType(formatter.getContentType());
 					triples = formatter.print(it, out);
-				}
-				else
+				} else {
 					sendError(ctx, req, resp, HttpServletResponse.SC_NOT_FOUND, "resource not found");
+				}
 				
 				_log.info("[proxy] GET " + resource.toN3() + " " + (System.currentTimeMillis() - start) + "ms " + triples + "t");
 			}
-
-		} 
-		catch (StoreException e) {
+		} catch (StoreException e) {
 			_log.severe(e.getMessage());
 			sendError(ctx, req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}

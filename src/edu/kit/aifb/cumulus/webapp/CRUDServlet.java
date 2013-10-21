@@ -17,8 +17,7 @@ import edu.kit.aifb.cumulus.store.Store;
 import edu.kit.aifb.cumulus.store.StoreException;
 import edu.kit.aifb.cumulus.webapp.formatter.SerializationFormat;
 
-/** 
- * 
+/**
  * @author aharth
  */
 @SuppressWarnings("serial")
@@ -31,8 +30,9 @@ public class CRUDServlet extends AbstractHttpServlet {
 			
 		ServletContext ctx = getServletContext();
 
-		if (req.getCharacterEncoding() == null)
-				req.setCharacterEncoding("UTF-8");
+		if (req.getCharacterEncoding() == null) {
+			req.setCharacterEncoding("UTF-8");
+		}
 
 		resp.setCharacterEncoding("UTF-8");
 			
@@ -65,12 +65,10 @@ public class CRUDServlet extends AbstractHttpServlet {
 			if (it.hasNext()) {
 				resp.setContentType(formatter.getContentType());
 				triples = formatter.print(it, out);
-			}
-			else
+			} else {
 				sendError(ctx, req, resp, HttpServletResponse.SC_NOT_FOUND, "resource not found");
-
-		} 
-		catch (StoreException e) {
+			}
+		} catch (StoreException e) {
 			_log.severe(e.getMessage());
 			sendError(ctx, req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}

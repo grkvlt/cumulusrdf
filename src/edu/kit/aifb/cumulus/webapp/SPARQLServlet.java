@@ -37,26 +37,25 @@ import org.openrdf.sail.NotifyingSailConnection;
 import edu.kit.aifb.cumulus.store.Store;
 import edu.kit.aifb.cumulus.store.sesame.CumulusRDFStore;
 
-/** 
- * 
+/**
  * @author aharth
  */
 @SuppressWarnings("serial")
 public class SPARQLServlet extends HttpServlet {
 	private final Logger _log = Logger.getLogger(this.getClass().getName());
-	static SimpleDateFormat RFC822 = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
+	private final SimpleDateFormat RFC822 = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
 
-	static int EXPIRES_HOURS = 24;
-	
+	private static final int EXPIRES_HOURS = 24;
+
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		OutputStream out = resp.getOutputStream();
 
 		String query = req.getParameter("query");
-		
+
 		ServletContext ctx = getServletContext();
-		
+
 		Store crdf = (Store)ctx.getAttribute(Listener.STORE);
-		
+
         String accept = req.getParameter("accept");
         if (accept == null) {
         	accept = req.getHeader("accept");
@@ -68,20 +67,20 @@ public class SPARQLServlet extends HttpServlet {
         }
         
         _log.info("accept header is " + accept);
-		
+
 		CumulusRDFStore store = new CumulusRDFStore(crdf);
-		
+
 //		InvertedIndex ii = (InvertedIndex)ctx.getAttribute(Listener.INVERTED_INDEX);
 //
 //		store.setInvertedIndex(ii);
-		
+
 		// do gzipping if accept-encoding is GZIP
 		String acceptEncoding = req.getHeader("Accept-Encoding");
 		if (acceptEncoding != null && acceptEncoding.contains("gzip")) {
 			out = new GZIPOutputStream(out);
 			resp.setHeader("Content-Encoding", "gzip");
 		}
-		
+
 		try {
 			store.initialize();
 
@@ -89,9 +88,9 @@ public class SPARQLServlet extends HttpServlet {
 
 			Repository repo = new SailRepository(store);
 			RepositoryConnection repoConn = repo.getConnection();
-			
+
 			Query q = repoConn.prepareQuery(QueryLanguage.SPARQL, query);
-			
+
 			if (q instanceof BooleanQuery) {
 				boolean qres = ((BooleanQuery)q).evaluate();
 
@@ -100,7 +99,7 @@ public class SPARQLServlet extends HttpServlet {
 					fmt = BooleanQueryResultFormat.SPARQL;
 					accept = "application/sparql-results+xml";
 				}
-				
+
 				resp.setContentType(accept);
 				// stuff's cached for a week
 				resp.setHeader("Cache-Control", "public");
@@ -121,15 +120,15 @@ public class SPARQLServlet extends HttpServlet {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if (q instanceof TupleQuery) {		
+			} else if (q instanceof TupleQuery) {
 				TupleQueryResult qres = ((TupleQuery)q).evaluate();
-				
+
 				TupleQueryResultFormat fmt = TupleQueryResultFormat.forMIMEType(accept);
 				if (fmt == null) {
 					fmt = TupleQueryResultFormat.SPARQL;
 					accept = "application/sparql-results+xml";
 				}
-				
+
 				resp.setContentType(accept);
 				// stuff's cached for a week
 				resp.setHeader("Cache-Control", "public");
@@ -140,7 +139,7 @@ public class SPARQLServlet extends HttpServlet {
 				resp.setHeader("Expires", RFC822.format(c.getTime()));
 				resp.setHeader("Access-Control-Allow-Origin", "*");
 				resp.setHeader("Vary", "Accept");
-				
+
 				try {
 					QueryResultIO.write(qres, fmt, out);
 				} catch (TupleQueryResultHandlerException e) {
@@ -174,7 +173,7 @@ public class SPARQLServlet extends HttpServlet {
 				resp.setHeader("Expires", RFC822.format(c.getTime()));
 				resp.setHeader("Access-Control-Allow-Origin", "*");
 				resp.setHeader("Vary", "Accept");
-				
+
 				try {
 					QueryResultIO.write(qres, fmt, out);
 				} catch (RDFHandlerException e) {
@@ -199,7 +198,7 @@ public class SPARQLServlet extends HttpServlet {
 			resp.sendError(500, e.getMessage());
 			return;
 		}
-		
+
 		out.close();
 	}
 }

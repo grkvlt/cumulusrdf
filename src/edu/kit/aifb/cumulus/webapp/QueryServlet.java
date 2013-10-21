@@ -20,8 +20,7 @@ import edu.kit.aifb.cumulus.store.Store;
 import edu.kit.aifb.cumulus.store.StoreException;
 import edu.kit.aifb.cumulus.webapp.formatter.SerializationFormat;
 
-/** 
- * 
+/**
  * @author aharth
  */
 @SuppressWarnings("serial")
@@ -75,10 +74,9 @@ public class QueryServlet extends AbstractHttpServlet {
 			if (it.hasNext()) {
 				resp.setContentType(formatter.getContentType());
 				triples = formatter.print(it, out);
-			}
-			else
+			} else {
 				sendError(ctx, req, resp, HttpServletResponse.SC_NOT_FOUND, "resource not found");
-			
+			}
 		} catch (StoreException e) {
 			_log.severe(e.getMessage());
 			resp.sendError(500, e.getMessage());

@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.kit.aifb.cumulus.store.Store;
 
-/** 
- * 
+/**
  * @author aharth
  */
 @SuppressWarnings("serial")
@@ -23,41 +22,15 @@ public class InfoServlet extends HttpServlet {
 		resp.setContentType("text/plain");
 
 		ServletContext ctx = getServletContext();
-		
+
 		Store crdf = (Store)ctx.getAttribute(Listener.STORE);
-		
+
 		out.println(crdf.getStatus());
-		
-//		if (ctx.getAttribute(Listener.DATASET_HANDLER) != null) {
-//			out.println("configured as data server");
-//		}
-		
+
 		if (ctx.getAttribute(Listener.PROXY_MODE) != null) {
 			out.println("proxy mode enabled");
 		}
 
-		/*
-		out.println(crdf.getClient().toString());
-		
-		try {
-			out.println("cluster name: " + crdf.getClient().describe_cluster_name());
-			out.println("client version: " + crdf.getClient().describe_version());
-			out.println("partitioner: " + crdf.getClient().describe_partitioner());
-
-			for (KsDef keyspace : crdf.getClient().describe_keyspaces()) {
-				out.println("keyspace: " + keyspace);
-			}
-		} catch (TException e) {
-			e.printStackTrace();
-			resp.sendError(500, e.getMessage());
-			return;
-		} catch (InvalidRequestException e) {
-			e.printStackTrace();
-			resp.sendError(500, e.getMessage());
-			return;
-		}
-		*/
-		
 		out.close();
 	}
 }

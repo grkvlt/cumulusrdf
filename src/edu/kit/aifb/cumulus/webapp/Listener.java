@@ -26,8 +26,7 @@ import edu.kit.aifb.cumulus.webapp.formatter.NTriplesFormat;
 import edu.kit.aifb.cumulus.webapp.formatter.SerializationFormat;
 import edu.kit.aifb.cumulus.webapp.formatter.StaxRDFXMLFormat;
 
-/** 
- * 
+/**
  * @author aharth
  */
 public class Listener implements ServletContextListener {
@@ -108,10 +107,10 @@ public class Listener implements ServletContextListener {
 				// when that is used for configuration, we convert everything to Strings 
 				// here to keep the following config code simple
 				config = new HashMap<String,String>();
-				for (String key : yaml.keySet())
+				for (String key : yaml.keySet()) {
 					config.put(key, yaml.get(key).toString());
-			}
-			catch (IOException e) {
+				}
+			} catch (IOException e) {
 				e.printStackTrace();
 				_log.severe(e.getMessage());
 				ctx.setAttribute(ERROR, e);
@@ -122,8 +121,7 @@ public class Listener implements ServletContextListener {
 				ctx.setAttribute(ERROR, "config missing");
 				return;
 			}
-		}
-		else {
+		} else {
 			_log.info("config-file param not set or config file not found, using parameters from web.xml");
 			config = new HashMap<String,String>();
 			for (String param : CONFIG_PARAMS) {
@@ -147,8 +145,9 @@ public class Listener implements ServletContextListener {
 		_formats.put("ntriples", new NTriplesFormat());
 		_formats.put("html", new HTMLFormat());
 		
-		if (!config.containsKey(PARAM_HOSTS) || !config.containsKey(PARAM_KEYSPACE) ||
-				!config.containsKey(PARAM_LAYOUT)) {
+		if (!config.containsKey(PARAM_HOSTS)
+		        || !config.containsKey(PARAM_KEYSPACE)
+		        || !config.containsKey(PARAM_LAYOUT)) {
 			_log.severe("config must contain at least these parameters: " + (Arrays.asList(PARAM_HOSTS, PARAM_KEYSPACE, PARAM_LAYOUT)));
 			ctx.setAttribute(ERROR, "params missing");
 			return;
@@ -163,12 +162,13 @@ public class Listener implements ServletContextListener {
 			_log.info("keyspace: " + keyspace);
 			_log.info("storage layout: " + layout);
 			
-			if (LAYOUT_SUPER.equals(layout))
+			if (LAYOUT_SUPER.equals(layout)) {
 				_crdf = new CassandraRdfHectorHierHash(hosts, keyspace);
-			else if (LAYOUT_FLAT.equals(layout))
+			} else if (LAYOUT_FLAT.equals(layout)) {
 				_crdf = new CassandraRdfHectorFlatHash(hosts, keyspace);
-			else
+    		} else {
 				throw new IllegalArgumentException("unknown storage layout");
+    		}
 			
 			_crdf.open();
 			ctx.setAttribute(STORE, _crdf);
@@ -206,8 +206,9 @@ public class Listener implements ServletContextListener {
 		
 		if (config.containsKey(PARAM_PROXY_MODE)) {
 			boolean proxy = Boolean.parseBoolean(config.get(PARAM_PROXY_MODE));
-			if (proxy)
+			if (proxy) {
 				ctx.setAttribute(PROXY_MODE, true);
+			}
 		}
 		
 //		_ii = new InvertedIndex();
@@ -238,17 +239,19 @@ public class Listener implements ServletContextListener {
 	
 	public static String getFormat(String accept) {
 		for (String mimeType : _mimeTypes.keySet()) {
-			if (accept.contains(mimeType))
+			if (accept.contains(mimeType)) {
 				return _mimeTypes.get(mimeType);
+			}
 		}
 		return null;
 	}
 	
 	public static SerializationFormat getSerializationFormat(String accept) {
 		String format = getFormat(accept);
-		if (format != null) 
+		if (format != null) {
 			return _formats.get(format);
-		else
+		} else {
 			return _formats.get("ntriples");
+		}
 	}
 }
